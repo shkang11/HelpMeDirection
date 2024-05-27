@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.shkang.helpmedirection.databinding.ActivityMainBinding
+import java.net.URLEncoder
 
 class MainActivity : AppCompatActivity(){
 
@@ -41,19 +42,24 @@ class MainActivity : AppCompatActivity(){
     }
 
     private fun getDirections(from: String, to: String) {
+        // 예제 좌표와 이름 사용 (실제 좌표와 이름으로 교체해야 함)
+        val destinationLatitude = "37.5665"  // 도착지 위도
+        val destinationLongitude = "126.9780"  // 도착지 경도
+        val destinationName = Uri.encode(to)  // 도착지 이름
+
+        val url = "nmap://navigation?dlat=$destinationLatitude&dlng=$destinationLongitude&dname=$destinationName&appname=com.example.myapp"
+
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            setPackage("com.nhn.android.nmap")
+        }
+
         try {
-            val uri = Uri.parse("https://www.google.com/maps/dir/$from/$to")
-            val intent = Intent(Intent.ACTION_VIEW, uri).apply {
-                setPackage("com.google.android.apps.maps")
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            }
             startActivity(intent)
-        } catch(exception: ActivityNotFoundException) {
-            val uri = Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.apps.maps")
-            val intent = Intent(Intent.ACTION_VIEW, uri).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        } catch (e: Exception) {
+            val marketIntent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("market://details?id=com.nhn.android.nmap")
             }
-            startActivity(intent)
+            startActivity(marketIntent)
         }
     }
 
